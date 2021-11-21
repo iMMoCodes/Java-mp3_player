@@ -16,6 +16,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 public class Controller implements Initializable{
 // -------------------- VARIABLES -------------------- \\
@@ -73,23 +74,75 @@ public class Controller implements Initializable{
 
 // -------------------- METHODS -------------------- \\
     public void playMedia() {
-
+        mediaPlayer.play();
     }
 
     public void pauseMedia() {
-        
+        mediaPlayer.pause();
     }
 
     public void resetMedia() {
-        
+        mediaPlayer.seek(Duration.seconds(0));
     }
 
     public void prevMedia() {
-        
+        // Check that not first song on the list
+        if(songNumber > 0) {
+            // Decrease index
+            songNumber--;
+
+            mediaPlayer.stop();
+            // Get songs name and apply it to the screen
+            media = new Media(songs.get(songNumber).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            songLabel.setText(songs.get(songNumber).getName());
+            // Start previous song
+            playMedia();
+        }
+        // If first song on the list
+        else {
+            // Set to last song on the list
+            songNumber = songs.size() -1;
+
+            mediaPlayer.stop();
+            // Get songs name and apply it to the screen
+            media = new Media(songs.get(songNumber).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            songLabel.setText(songs.get(songNumber).getName());
+
+            // Start previous song
+            playMedia();
+        }        
     }
 
     public void nextMedia() {
-        
+        // Check that not last song on the list
+        if(songNumber < songs.size() -1) {
+            // Increase index
+            songNumber++;
+
+            mediaPlayer.stop();
+            // Get songs name and apply it to the screen
+            media = new Media(songs.get(songNumber).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            songLabel.setText(songs.get(songNumber).getName());
+            // Start next song
+            playMedia();
+        }
+        // If last song on the list
+        else {
+            // Set to first song
+            songNumber = 0;
+
+            mediaPlayer.stop();
+            // Get songs name and apply it to the screen
+            media = new Media(songs.get(songNumber).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            songLabel.setText(songs.get(songNumber).getName());
+
+            // Start next song
+            playMedia();
+        }
     }
 
     public void changeSpeed(ActionEvent event) {
