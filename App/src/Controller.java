@@ -69,19 +69,30 @@ public class Controller implements Initializable{
         media = new Media(songs.get(songNumber).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         songLabel.setText(songs.get(songNumber).getName());
+        // Populate play speed box with values
+        for(int i = 0; i < speeds.length; i++) {
+            speedBox.getItems().add(Integer.toString(speeds[i])+"%");
+        }
+        // Reference changeSpeed method
+        speedBox.setOnAction(this::changeSpeed);
     }
 // -------------------- END OF INITIALIZE -------------------- \\
 
 // -------------------- METHODS -------------------- \\
     public void playMedia() {
+        // To make speed stay the same if song is switched
+        changeSpeed(null);
+        // Play music
         mediaPlayer.play();
     }
 
     public void pauseMedia() {
+        // Pause music
         mediaPlayer.pause();
     }
 
     public void resetMedia() {
+        // Reset music -> Set duration back to 0
         mediaPlayer.seek(Duration.seconds(0));
     }
 
@@ -146,7 +157,15 @@ public class Controller implements Initializable{
     }
 
     public void changeSpeed(ActionEvent event) {
-        
+        // Check if no value set and set it to 1
+        if(speedBox.getValue() == null) {
+            mediaPlayer.setRate(1);
+        } else {
+            // Get value -> regular speed (100) is 1 so got to divide value by 100
+            //mediaPlayer.setRate(Integer.parseInt(speedBox.getValue()) * 0.01);
+            // Upper causes crash because % added after number -> Remove the %
+            mediaPlayer.setRate(Integer.parseInt(speedBox.getValue().substring(0, speedBox.getValue().length() - 1)) * 0.01);
+        }
     }
 
     public void beginTimer() {
