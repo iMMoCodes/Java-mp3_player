@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -75,6 +77,13 @@ public class Controller implements Initializable{
         }
         // Reference changeSpeed method
         speedBox.setOnAction(this::changeSpeed);
+        // Add anonymous change listener to volume slider
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+                mediaPlayer.setVolume(volumeSlider.getValue() * 0.01);
+            }   
+        });
     }
 // -------------------- END OF INITIALIZE -------------------- \\
 
