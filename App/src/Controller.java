@@ -84,23 +84,33 @@ public class Controller implements Initializable{
                 mediaPlayer.setVolume(volumeSlider.getValue() * 0.01);
             }   
         });
+        // Change color of progress bar
+        songProgressBar.setStyle("-fx-accent: #00FF00;");
     }
 // -------------------- END OF INITIALIZE -------------------- \\
 
 // -------------------- METHODS -------------------- \\
     public void playMedia() {
+        // Start progress timer
+        beginTimer();
         // To make speed stay the same if song is switched
         changeSpeed(null);
+        // To make volume stay the same
+        mediaPlayer.setVolume(volumeSlider.getValue() * 0.01);
         // Play music
         mediaPlayer.play();
     }
 
     public void pauseMedia() {
+        // Pause timer
+        cancelTimer();
         // Pause music
         mediaPlayer.pause();
     }
 
     public void resetMedia() {
+        // Reset progressbar
+        songProgressBar.setProgress(0);
         // Reset music -> Set duration back to 0
         mediaPlayer.seek(Duration.seconds(0));
     }
@@ -112,6 +122,10 @@ public class Controller implements Initializable{
             songNumber--;
 
             mediaPlayer.stop();
+            // If song is playing, cancel timer when moved to previous song
+            if(running) {
+                cancelTimer();
+            }
             // Get songs name and apply it to the screen
             media = new Media(songs.get(songNumber).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -125,6 +139,10 @@ public class Controller implements Initializable{
             songNumber = songs.size() -1;
 
             mediaPlayer.stop();
+
+            if(running) {
+                cancelTimer();
+            }
             // Get songs name and apply it to the screen
             media = new Media(songs.get(songNumber).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -142,6 +160,10 @@ public class Controller implements Initializable{
             songNumber++;
 
             mediaPlayer.stop();
+
+            if(running) {
+                cancelTimer();
+            }
             // Get songs name and apply it to the screen
             media = new Media(songs.get(songNumber).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -155,6 +177,10 @@ public class Controller implements Initializable{
             songNumber = 0;
 
             mediaPlayer.stop();
+
+            if(running) {
+                cancelTimer();
+            }
             // Get songs name and apply it to the screen
             media = new Media(songs.get(songNumber).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -178,11 +204,33 @@ public class Controller implements Initializable{
     }
 
     public void beginTimer() {
-        
+        // Initialize timer and task
+        timer = new Timer();
+        task = new TimerTask() {
+
+            @Override
+            public void run() {
+                running = true;
+                // Get current elapsed time
+                double current = mediaPlayer.getCurrentTime().toSeconds();
+                // Get total time of song
+                double end = media.getDuration().toSeconds();
+                // Set progress to elapsed / total time of song
+                songProgressBar.setProgress(current/end);
+                // When times are same, cancel timer
+                if(current/end == 1) {
+                    cancelTimer();
+                }
+            }
+            
+        };
+        // Do the task a once every second
+        timer.scheduleAtFixedRate(task, 0, 1000);
     }
 
     public void cancelTimer() {
-        
+        running = false;
+        timer.cancel();
     }
     // -------------------- END OF METHODS -------------------- \\
 }
